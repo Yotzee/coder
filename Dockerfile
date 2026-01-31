@@ -123,8 +123,11 @@ RUN apt-get clean && \
     cd /opt/websockify && pip3 install --no-cache-dir --break-system-packages . && \
     rm -rf /tmp/* /root/.cache
 
-# Create a non-root user for development with zsh as default shell
-RUN useradd -m -s /bin/zsh developer \
+# Install sudo and create a non-root user for development with zsh as default shell
+RUN apt-get update && apt-get install -y sudo \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m -s /bin/zsh developer \
+    && echo 'developer ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
     && mkdir -p /go /home/developer/workspace \
     && chown -R developer:developer /go /home/developer /opt/noVNC
 
