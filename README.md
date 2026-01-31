@@ -10,10 +10,14 @@ A comprehensive Ubuntu-based Docker development environment with all the essenti
 - **Go** (1.21.5)
 - **Terraform**
 - **Chromium** browser and chromedriver
+- **Visual Studio Code**
+- **Ghostty** terminal emulator
+- **OpenCode** AI coding agent for the terminal
 - **Docker CLI** (connects to external Docker daemon)
 - **kubectl**
 - **Git**
 - **Zsh** with Oh My Zsh (robbyrussell theme)
+- **Web-based RDP** (XFCE desktop via noVNC on port 8080)
 
 ## Building the Image
 
@@ -21,12 +25,46 @@ A comprehensive Ubuntu-based Docker development environment with all the essenti
 docker build -t coder-dev .
 ```
 
+### Troubleshooting Build Issues
+
+If you encounter "not enough free space" errors during build:
+
+1. **Free up Docker disk space:**
+   ```bash
+   docker system prune -a --volumes
+   ```
+
+2. **Increase Docker Desktop disk allocation:**
+   - Docker Desktop → Settings → Resources → Advanced
+   - Increase the disk image size (recommended: at least 60GB)
+
+3. **Build with BuildKit (more efficient):**
+   ```bash
+   DOCKER_BUILDKIT=1 docker build -t coder-dev .
+   ```
+
 ## Running the Container
 
-### Basic Usage
+### Web RDP Access (Default)
+
+The container starts with a web-based RDP desktop by default on port 8080:
 
 ```bash
-docker run --rm -it coder-dev
+docker run --rm -d -p 8080:8080 \
+  -v $(pwd):/home/developer/workspace \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name coder-dev \
+  coder-dev
+```
+
+Then access the desktop at: **http://localhost:8080**
+
+### Basic Usage (Shell Only)
+
+To run with shell access instead of RDP:
+
+```bash
+docker run --rm -it coder-dev /bin/zsh
 ```
 
 ### With Volume Mount (Recommended)
@@ -56,13 +94,17 @@ docker run --rm -it \
 
 ### With Port Forwarding
 
-If you need to expose ports (e.g., for web development):
+If you need to expose ports (e.g., for web development or RDP):
 
 ```bash
-docker run --rm -it -p 3000:3000 -p 8080:8080 \
+docker run --rm -d -p 8080:8080 -p 3000:3000 \
   -v $(pwd):/home/developer/workspace \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name coder-dev \
   coder-dev
 ```
+
+Access web RDP at: **http://localhost:8080**
 
 ### Detached Mode (Background)
 
@@ -91,6 +133,9 @@ docker --version
 kubectl version --client
 gcc --version
 clang --version
+code --version
+ghostty --version
+opencode --version
 ```
 
 ### Access Container Shell
@@ -107,5 +152,7 @@ docker exec -it <container-id> /bin/zsh
 - Default working directory: `/home/developer/workspace`
 - Docker CLI connects to the host's Docker daemon (no Docker daemon runs inside the container)
 - All tools are installed system-wide and available in PATH
+- **Default behavior**: Container starts web RDP desktop on port 8080 (XFCE via noVNC)
+- To access shell instead of RDP, override CMD: `docker run --rm -it coder-dev /bin/zsh`
 
 

@@ -14,9 +14,10 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Git
+# Install Git and vim
 RUN apt-get update && apt-get install -y \
     git \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Zsh and Oh My Zsh dependencies
@@ -24,14 +25,17 @@ RUN apt-get update && apt-get install -y \
     zsh \
     && rm -rf /var/lib/apt/lists/*
 
-# Install C++ compilers (gcc and clang)
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    g++ \
-    clang \
-    clang-format \
-    && rm -rf /var/lib/apt/lists/*
+# Install C++ compilers (gcc and clang) - split into smaller steps to save space
+RUN apt-get clean && \
+    rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends gcc g++ make binutils && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/* && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends clang clang-format && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 # Install Node.js (using NodeSource repository for latest LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
@@ -42,9 +46,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
 RUN wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
     && dpkg -i packages-microsoft-prod.deb \
     && rm packages-microsoft-prod.deb \
-    && apt-get update \
+    && apt-get clean && \
+    rm -rf /var/cache/apt/archives/* && \
+    apt-get update \
     && apt-get install -y dotnet-sdk-8.0 \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Install Go
 RUN wget -O go.tar.gz https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \
@@ -59,10 +66,23 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/s
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chromium and dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get clean && \
+    rm -rf /var/cache/apt/archives/* && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
     chromium-browser \
     chromium-chromedriver \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install Ghostty terminal emulator (community .deb from mkasberg/ghostty-ubuntu)
+RUN GHOSTTY_VERSION="1.2.3-0.ppa1" && \
+    ARCH=$(dpkg --print-architecture) && \
+    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/1.2.3-0-ppa1/ghostty_${GHOSTTY_VERSION}_${ARCH}_24.04.deb" && \
+    apt-get update && \
+    apt-get install -y /tmp/ghostty.deb && \
+    rm -f /tmp/ghostty.deb && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Docker CLI only (no daemon - connect to external Docker daemon via socket mount)
 # Usage: docker run -v /var/run/docker.sock:/var/run/docker.sock ...
@@ -82,10 +102,49 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
+# Install desktop environment, VNC, and noVNC for web-based RDP
+# Using --no-install-recommends to reduce package size
+RUN apt-get clean && \
+    rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    xfce4 \
+    xfce4-goodies \
+    x11vnc \
+    xvfb \
+    dbus-x11 \
+    python3 \
+    python3-pip \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* && \
+    cd /tmp && \
+    git clone --depth 1 https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone --depth 1 https://github.com/novnc/websockify.git /opt/websockify && \
+    cd /opt/websockify && pip3 install --no-cache-dir --break-system-packages . && \
+    rm -rf /tmp/* /root/.cache
+
 # Create a non-root user for development with zsh as default shell
 RUN useradd -m -s /bin/zsh developer \
     && mkdir -p /go /home/developer/workspace \
-    && chown -R developer:developer /go /home/developer
+    && chown -R developer:developer /go /home/developer /opt/noVNC
+
+# Copy and set up startup script for web RDP
+COPY start-rdp.sh /usr/local/bin/start-rdp.sh
+RUN chmod +x /usr/local/bin/start-rdp.sh
+
+# Install Visual Studio Code
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -O /tmp/code.deb "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-${ARCH}" && \
+    apt-get update && \
+    apt-get install -y /tmp/code.deb && \
+    rm -f /tmp/code.deb && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install opencode-ai (AI coding agent for the terminal)
+RUN npm install -g opencode-ai
+
+# Expose port 8080 for web RDP
+EXPOSE 8080
 
 # Switch to developer user
 USER developer
@@ -102,6 +161,6 @@ WORKDIR /home/developer/workspace
 # Set default shell to zsh for all RUN commands
 SHELL ["/bin/zsh", "-c"]
 
-# Default command - start zsh shell
-CMD ["/bin/zsh"]
+# Default command - start web RDP on port 8080
+CMD ["/usr/local/bin/start-rdp.sh"]
 
