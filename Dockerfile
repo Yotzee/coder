@@ -144,8 +144,8 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
     apt-get install -y code && \
     rm -rf /var/lib/apt/lists/*
 
-# Install opencode-ai (AI coding agent for the terminal)
-RUN npm install -g opencode-ai
+# Install AI coding agents
+RUN npm install -g @anthropic-ai/claude-code opencode-ai
 
 # Expose port 8080 for web RDP
 EXPOSE 8080
@@ -159,6 +159,11 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     && sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="robbyrussell"/' ~/.zshrc || echo 'ZSH_THEME="robbyrussell"' >> ~/.zshrc \
     && sed -i 's/^plugins=(.*)/plugins=(git terraform kubectl)/' ~/.zshrc || echo 'plugins=(git terraform kubectl)' >> ~/.zshrc \
     && echo 'alias k=kubectl' >> ~/.zshrc
+
+# Create auth directories for AI coding tools (mount from host to persist auth)
+RUN mkdir -p /home/developer/.claude /home/developer/.config/opencode
+
+VOLUME ["/home/developer/.claude", "/home/developer/.config/opencode"]
 
 WORKDIR /home/developer/workspace
 

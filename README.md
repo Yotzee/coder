@@ -53,6 +53,8 @@ The container starts with a web-based RDP desktop by default on port 8080:
 docker run --rm -d -p 8080:8080 \
   -v $(pwd):/home/developer/workspace \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.claude:/home/developer/.claude \
+  -v ~/.config/opencode:/home/developer/.config/opencode \
   --name coder-dev \
   coder-dev
 ```
@@ -83,12 +85,14 @@ To use Docker commands inside the container (connects to host Docker daemon):
 docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock coder-dev
 ```
 
-### Complete Setup (Volume + Docker Socket)
+### Complete Setup (Volume + Docker Socket + AI Auth)
 
 ```bash
 docker run --rm -it \
   -v $(pwd):/home/developer/workspace \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.claude:/home/developer/.claude \
+  -v ~/.config/opencode:/home/developer/.config/opencode \
   coder-dev
 ```
 
@@ -100,6 +104,8 @@ If you need to expose ports (e.g., for web development or RDP):
 docker run --rm -d -p 8080:8080 -p 3000:3000 \
   -v $(pwd):/home/developer/workspace \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.claude:/home/developer/.claude \
+  -v ~/.config/opencode:/home/developer/.config/opencode \
   --name coder-dev \
   coder-dev
 ```
@@ -114,6 +120,8 @@ Run container in detached mode (use `docker exec` to access):
 docker run --rm -d --name coder-dev \
   -v $(pwd):/home/developer/workspace \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/.claude:/home/developer/.claude \
+  -v ~/.config/opencode:/home/developer/.config/opencode \
   coder-dev
 
 # Access the container
@@ -145,6 +153,17 @@ The container starts with zsh by default. You can also access it with:
 ```bash
 docker exec -it <container-id> /bin/zsh
 ```
+
+## AI Tool Authentication
+
+The container includes **Claude Code** and **OpenCode** AI coding tools. To use them with your existing authentication, mount the config directories from your host:
+
+| Tool | Host Path | Container Path |
+|---|---|---|
+| Claude Code | `~/.claude/` | `/home/developer/.claude` |
+| OpenCode | `~/.config/opencode/` | `/home/developer/.config/opencode` |
+
+These volumes are declared in the Dockerfile and included in all `docker run` examples above. If you haven't authenticated with these tools on your host yet, the directories will be created automatically and you can authenticate from inside the container.
 
 ## Notes
 
