@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main", "master"]
     paths:
       - "Dockerfile"
       - "start-rdp.sh"
@@ -10,7 +10,7 @@ on:
       - "README.md"
       - ".github/workflows/dockerhub.yml"
   pull_request:
-    branches: ["master"]
+    branches: ["main", "master"]
     paths:
       - "Dockerfile"
       - "start-rdp.sh"

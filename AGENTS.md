@@ -7,7 +7,7 @@ image with a web-based XFCE desktop (via noVNC). It is **not** an application
 codebase — it is an infrastructure/DevOps project consisting of a Dockerfile,
 a shell script, a VERSION file, and documentation.
 
-Repository: `https://git.yotzee.com/yotzee/coder.git`
+Repository: `https://github.com/Yotzee/coder.git`
 Branch: `master`
 
 ### File Inventory
