@@ -2,6 +2,20 @@
 
 A comprehensive Ubuntu-based Docker development environment with all the essential tools for modern software development.
 
+## Screenshots
+
+### Web Desktop (noVNC)
+
+Access a full XFCE desktop environment through your browser at `http://localhost:8080`:
+
+![Web Desktop via noVNC](screenshots/desktop.png)
+
+### Installed Tools
+
+All 12+ development tools come pre-installed and ready to use:
+
+![Installed Development Tools](screenshots/tools.png)
+
 ## Docker Overview
 
 ```
