@@ -2,6 +2,34 @@
 
 A comprehensive Ubuntu-based Docker development environment with all the essential tools for modern software development.
 
+## Docker Overview
+
+```
+┌──────────────────────────────────────────────────┐
+│  ubuntu:latest                                   │
+│                                                  │
+│  User: developer (non-root, passwordless sudo)   │
+│  Shell: zsh + Oh My Zsh                          │
+│                                                  │
+│  ┌────────────────────────────────────────────┐  │
+│  │  Desktop: XFCE4 + noVNC (web RDP)         │  │
+│  │  Port 8080 → browser-based desktop        │  │
+│  └────────────────────────────────────────────┘  │
+│                                                  │
+│  Volumes:                                        │
+│  • /home/developer/workspace  ← host project     │
+│  • /var/run/docker.sock       ← host Docker      │
+│  • /home/developer/.claude    ← Claude Code auth │
+│  • /home/developer/.config/   ← OpenCode auth   │
+│        opencode                                  │
+│                                                  │
+│  Languages: Node.js, .NET 8, Go, C/C++          │
+│  Tools: Terraform, kubectl, Docker CLI, Git      │
+│  Editors: VS Code, Ghostty                       │
+│  AI: Claude Code, OpenCode                       │
+└──────────────────────────────────────────────────┘
+```
+
 ## Included Tools
 
 - **Node.js** (LTS)
@@ -12,6 +40,7 @@ A comprehensive Ubuntu-based Docker development environment with all the essenti
 - **Chromium** browser and chromedriver
 - **Visual Studio Code**
 - **Ghostty** terminal emulator
+- **Claude Code** AI coding agent (Anthropic)
 - **OpenCode** AI coding agent for the terminal
 - **Docker CLI** (connects to external Docker daemon)
 - **kubectl**
