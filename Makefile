@@ -2,7 +2,7 @@ IMAGE_NAME := coder-dev
 CONTAINER_NAME := coder-dev
 PORT := 8080
 
-.PHONY: build start stop restart shell logs clean
+.PHONY: build start stop restart shell logs clean bump
 
 ## Build the Docker image (uses BuildKit)
 build:
@@ -35,6 +35,16 @@ shell:
 ## Show container logs
 logs:
 	docker logs -f $(CONTAINER_NAME)
+
+## Bump patch version (e.g., 1.0.0 → 1.0.1)
+bump:
+	@VERSION=$$(cat VERSION | tr -d '\n') && \
+	MAJOR=$$(echo $$VERSION | cut -d. -f1) && \
+	MINOR=$$(echo $$VERSION | cut -d. -f2) && \
+	PATCH=$$(echo $$VERSION | cut -d. -f3) && \
+	NEW_VERSION="$$MAJOR.$$MINOR.$$((PATCH + 1))" && \
+	echo "$$NEW_VERSION" > VERSION && \
+	echo "Bumped version: $$VERSION → $$NEW_VERSION"
 
 ## Remove image and prune Docker cache
 clean:
