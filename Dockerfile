@@ -144,8 +144,8 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
     apt-get install -y code && \
     rm -rf /var/lib/apt/lists/*
 
-# Install opencode-ai (AI coding agent for the terminal)
-RUN npm install -g opencode-ai
+# Install AI coding agents
+RUN npm install -g @anthropic-ai/claude-code opencode-ai
 
 # Expose port 8080 for web RDP
 EXPOSE 8080
