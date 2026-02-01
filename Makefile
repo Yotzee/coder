@@ -15,6 +15,8 @@ start:
 		-p $(PORT):8080 \
 		-v $$(pwd):/home/developer/workspace \
 		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $$HOME/.claude:/home/developer/.claude \
+		-v $$HOME/.config/opencode:/home/developer/.config/opencode \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 	@echo "Web VNC running at http://localhost:$(PORT)"

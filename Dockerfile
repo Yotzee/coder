@@ -160,6 +160,11 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     && sed -i 's/^plugins=(.*)/plugins=(git terraform kubectl)/' ~/.zshrc || echo 'plugins=(git terraform kubectl)' >> ~/.zshrc \
     && echo 'alias k=kubectl' >> ~/.zshrc
 
+# Create auth directories for AI coding tools (mount from host to persist auth)
+RUN mkdir -p /home/developer/.claude /home/developer/.config/opencode
+
+VOLUME ["/home/developer/.claude", "/home/developer/.config/opencode"]
+
 WORKDIR /home/developer/workspace
 
 # Set default shell to zsh for all RUN commands
