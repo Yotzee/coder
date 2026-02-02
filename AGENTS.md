@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository builds a comprehensive Ubuntu-based Docker development container
+This repository builds a comprehensive Arch Linux-based Docker development container
 image with a web-based XFCE desktop (via noVNC). It is **not** an application
 codebase — it is an infrastructure/DevOps project consisting of a Dockerfile,
 a shell script, a VERSION file, and documentation.
@@ -14,9 +14,9 @@ Branch: `master`
 
 | File           | Purpose                                              |
 |----------------|------------------------------------------------------|
-| `Dockerfile`   | Defines the Ubuntu-based dev container image         |
+| `Dockerfile`   | Defines the Arch Linux-based dev container image     |
 | `start-rdp.sh` | Bash startup script for web RDP (Xvfb/XFCE/noVNC)  |
-| `VERSION`      | Semver version string (currently `1.0.0`)            |
+| `VERSION`      | Semver version string (currently `1.2.0`)            |
 | `README.md`    | User-facing documentation                            |
 | `AGENTS.md`    | This file — instructions for AI coding agents        |
 
@@ -61,7 +61,7 @@ exist. Validation is manual: build the image and verify tools work inside it.
 ```bash
 # Quick smoke test after building
 docker run --rm coder-dev bash -c \
-  "node --version && dotnet --version && go version && terraform version && gcc --version"
+  "node --version && go version && terraform version && gcc --version"
 ```
 
 ## Linting
@@ -84,21 +84,19 @@ shellcheck start-rdp.sh
 
 ### Dockerfile Conventions
 
-- **Base image**: `ubuntu:latest` — do not pin to a specific Ubuntu version
-- **Layer cleanup**: Every `apt-get install` block MUST end with
-  `rm -rf /var/lib/apt/lists/*` to reduce image size
+- **Base image**: `archlinux:latest` — do not pin to a specific Arch version
+- **Layer cleanup**: Every `pacman` install block MUST end with
+  `rm -rf /var/cache/pacman/pkg/*` to reduce image size
 - **Minimize layers**: Use `&&` to chain related commands in a single `RUN`
-- **Use `--no-install-recommends`** for large package groups to reduce bloat
 - **Comments**: Each `RUN` block should have a comment above it explaining
   what is being installed and why
 - **Ordering**: Install tools in this order:
   1. Base dependencies (curl, wget, gnupg, ca-certificates)
   2. Core dev tools (git, vim, zsh)
-  3. Language runtimes/SDKs (C++, Node.js, .NET, Go)
+  3. Language runtimes/SDKs (C++, Node.js, Go)
   4. Infrastructure tools (Terraform, Docker CLI, kubectl)
-  5. Browser/testing tools (Chromium, chromedriver)
-  6. Desktop environment (XFCE, VNC, noVNC)
-  7. User setup and configuration
+  5. Desktop environment (XFCE, VNC, noVNC)
+  6. User setup and configuration
 - **Non-root user**: The container runs as `developer`, not root. All user-space
   configuration (Oh My Zsh, shell rc files) happens after `USER developer`
 - **ENV variables**: Set PATH additions via `ENV`, not in shell rc files
@@ -148,8 +146,8 @@ shellcheck start-rdp.sh
 
 ### Installed Tools (inside the container)
 
-Node.js LTS, .NET SDK 8.0, GCC/G++, Clang/clang-format, Go 1.21.5,
-Terraform (latest), Chromium + chromedriver, Docker CLI + Compose plugin,
+Node.js, GCC/G++, Clang/clang-format, Go,
+Terraform, Docker CLI + Compose plugin,
 kubectl (latest stable), Git, Vim, Zsh + Oh My Zsh.
 
 ### Docker Socket

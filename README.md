@@ -1,6 +1,6 @@
 # Coder Development Container
 
-A comprehensive Ubuntu-based Docker development environment with all the essential tools for modern software development.
+A comprehensive Arch Linux-based Docker development environment with all the essential tools for modern software development.
 
 ## Screenshots
 
@@ -20,7 +20,7 @@ All 12+ development tools come pre-installed and ready to use:
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  ubuntu:latest                                   │
+│  archlinux:latest                                │
 │                                                  │
 │  User: developer (non-root, passwordless sudo)   │
 │  Shell: zsh + Oh My Zsh                          │
@@ -39,9 +39,9 @@ All 12+ development tools come pre-installed and ready to use:
 │  • /home/developer/.config/   ← Codex auth       │
 │        codex                                     │
 │                                                  │
-│  Languages: Node.js, .NET 8, Go, C/C++          │
+│  Languages: Node.js, Go, C/C++                  │
 │  Tools: Terraform, kubectl, Docker CLI, Git      │
-│  Editors: VS Code, Ghostty                       │
+│  Editors: VS Code                                │
 │  AI: Claude Code, OpenCode, Codex                │
 └──────────────────────────────────────────────────┘
 ```
@@ -53,7 +53,6 @@ All 12+ development tools come pre-installed and ready to use:
 - **Go** (1.21.5)
 - **Terraform**
 - **Visual Studio Code**
-- **Ghostty** terminal emulator
 - **Claude Code** AI coding agent (Anthropic)
 - **OpenCode** AI coding agent for the terminal
 - **Codex** AI coding agent for the terminal
@@ -191,7 +190,6 @@ kubectl version --client
 gcc --version
 clang --version
 code --version
-ghostty --version
 opencode --version
 codex --version
 ```

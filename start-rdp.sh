@@ -30,9 +30,9 @@ cat > /opt/noVNC/index.html <<'REDIRECT'
 REDIRECT
 
 # Start noVNC on port 8080 with auto-connect
+export PYTHONPATH=/opt/websockify
 /opt/noVNC/utils/novnc_proxy --vnc localhost:5900 --listen 8080 --web /opt/noVNC &
 
 # Keep container running
 echo "Web VNC is running on http://localhost:8080"
 wait
-
