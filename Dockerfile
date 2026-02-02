@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     lsb-release \
     man-db \
+    manpages \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Git and vim
