@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest AS base
 
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     manpages \
     && rm -rf /var/lib/apt/lists/*
 
+FROM base AS core-tools
+
 # Install Git and vim
 RUN apt-get update && apt-get install -y \
     git \
@@ -26,6 +28,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
     zsh \
     && rm -rf /var/lib/apt/lists/*
+
+FROM core-tools AS compilers
 
 # Install C++ compilers (gcc and clang) - split into smaller steps to save space
 RUN apt-get clean && \
@@ -38,6 +42,8 @@ RUN apt-get clean && \
     apt-get install -y --no-install-recommends clang clang-format && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+
+FROM compilers AS runtimes
 
 # Install Node.js (using NodeSource repository for latest LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
@@ -59,6 +65,8 @@ RUN wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/package
 RUN wget -O go.tar.gz https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \
     && tar -C /usr/local -xzf go.tar.gz \
     && rm go.tar.gz
+
+FROM runtimes AS tooling
 
 # Install Terraform
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg \
@@ -104,6 +112,8 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 ENV GOPATH="/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
+FROM tooling AS desktop
+
 # Install desktop environment, VNC, and noVNC for web-based RDP
 # Using --no-install-recommends to reduce package size
 RUN apt-get clean && \
@@ -124,6 +134,8 @@ RUN apt-get clean && \
     git clone --depth 1 https://github.com/novnc/websockify.git /opt/websockify && \
     cd /opt/websockify && pip3 install --no-cache-dir --break-system-packages . && \
     rm -rf /tmp/* /root/.cache
+
+FROM desktop AS final
 
 # Install sudo and create a non-root user for development with zsh as default shell
 RUN apt-get update && apt-get install -y sudo \
