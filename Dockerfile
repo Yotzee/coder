@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     apt-transport-https \
     lsb-release \
+    man-db \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Git and vim
@@ -145,7 +146,7 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
     rm -rf /var/lib/apt/lists/*
 
 # Install AI coding agents
-RUN npm install -g @anthropic-ai/claude-code opencode-ai
+RUN npm install -g @anthropic-ai/claude-code opencode-ai @openai/codex
 
 # Expose port 8080 for web RDP
 EXPOSE 8080
@@ -172,4 +173,3 @@ SHELL ["/bin/zsh", "-c"]
 
 # Default command - start web RDP on port 8080
 CMD ["/usr/local/bin/start-rdp.sh"]
-

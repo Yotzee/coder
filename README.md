@@ -56,6 +56,7 @@ All 12+ development tools come pre-installed and ready to use:
 - **Ghostty** terminal emulator
 - **Claude Code** AI coding agent (Anthropic)
 - **OpenCode** AI coding agent for the terminal
+- **Codex** AI coding agent for the terminal
 - **Docker CLI** (connects to external Docker daemon)
 - **kubectl**
 - **Git**
@@ -216,5 +217,4 @@ These volumes are declared in the Dockerfile and included in all `docker run` ex
 - All tools are installed system-wide and available in PATH
 - **Default behavior**: Container starts web RDP desktop on port 8080 (XFCE via noVNC)
 - To access shell instead of RDP, override CMD: `docker run --rm -it coder-dev /bin/zsh`
-
 
