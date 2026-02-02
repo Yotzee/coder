@@ -16,6 +16,27 @@ All 12+ development tools come pre-installed and ready to use:
 
 ![Installed Development Tools](https://raw.githubusercontent.com/Yotzee/coder/master/screenshots/tools.png)
 
+### Capture Screenshots
+
+Use **Playwright** to capture the web desktop after starting the container:
+
+```bash
+bash scripts/make-screenshot.sh
+```
+
+Defaults:
+
+```bash
+TARGET_URL=http://localhost:8080/
+OUTPUT_PATH=screenshots/desktop.png
+```
+
+You can override them for custom captures:
+
+```bash
+TARGET_URL=http://localhost:8080/ OUTPUT_PATH=screenshots/custom.png bash scripts/make-screenshot.sh
+```
+
 ## Docker Overview
 
 ```
