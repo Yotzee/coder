@@ -34,24 +34,24 @@ All 12+ development tools come pre-installed and ready to use:
 │  • /home/developer/workspace  ← host project     │
 │  • /var/run/docker.sock       ← host Docker      │
 │  • /home/developer/.claude    ← Claude Code auth │
-│  • /home/developer/.config/   ← OpenCode auth   │
+│  • /home/developer/.config/   ← OpenCode auth    │
 │        opencode                                  │
+│  • /home/developer/.config/   ← Codex auth       │
+│        codex                                     │
 │                                                  │
 │  Languages: Node.js, .NET 8, Go, C/C++          │
 │  Tools: Terraform, kubectl, Docker CLI, Git      │
 │  Editors: VS Code, Ghostty                       │
-│  AI: Claude Code, OpenCode                       │
+│  AI: Claude Code, OpenCode, Codex                │
 └──────────────────────────────────────────────────┘
 ```
 
 ## Included Tools
 
 - **Node.js** (LTS)
-- **.NET SDK 8.0**
 - **C++ Compilers** (gcc, g++, clang, clang-format)
 - **Go** (1.21.5)
 - **Terraform**
-- **Chromium** browser and chromedriver
 - **Visual Studio Code**
 - **Ghostty** terminal emulator
 - **Claude Code** AI coding agent (Anthropic)
@@ -100,6 +100,7 @@ docker run --rm -d -p 8080:8080 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.claude:/home/developer/.claude \
   -v ~/.config/opencode:/home/developer/.config/opencode \
+  -v ~/.config/codex:/home/developer/.config/codex \
   --name coder-dev \
   coder-dev
 ```
@@ -138,6 +139,7 @@ docker run --rm -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.claude:/home/developer/.claude \
   -v ~/.config/opencode:/home/developer/.config/opencode \
+  -v ~/.config/codex:/home/developer/.config/codex \
   coder-dev
 ```
 
@@ -151,6 +153,7 @@ docker run --rm -d -p 8080:8080 -p 3000:3000 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.claude:/home/developer/.claude \
   -v ~/.config/opencode:/home/developer/.config/opencode \
+  -v ~/.config/codex:/home/developer/.config/codex \
   --name coder-dev \
   coder-dev
 ```
@@ -167,6 +170,7 @@ docker run --rm -d --name coder-dev \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ~/.claude:/home/developer/.claude \
   -v ~/.config/opencode:/home/developer/.config/opencode \
+  -v ~/.config/codex:/home/developer/.config/codex \
   coder-dev
 
 # Access the container
@@ -189,6 +193,7 @@ clang --version
 code --version
 ghostty --version
 opencode --version
+codex --version
 ```
 
 ### Access Container Shell
@@ -201,12 +206,13 @@ docker exec -it <container-id> /bin/zsh
 
 ## AI Tool Authentication
 
-The container includes **Claude Code** and **OpenCode** AI coding tools. To use them with your existing authentication, mount the config directories from your host:
+The container includes **Claude Code**, **OpenCode**, and **Codex** AI coding tools. To use them with your existing authentication, mount the config directories from your host:
 
 | Tool | Host Path | Container Path |
 |---|---|---|
 | Claude Code | `~/.claude/` | `/home/developer/.claude` |
 | OpenCode | `~/.config/opencode/` | `/home/developer/.config/opencode` |
+| Codex | `~/.config/codex/` | `/home/developer/.config/codex` |
 
 These volumes are declared in the Dockerfile and included in all `docker run` examples above. If you haven't authenticated with these tools on your host yet, the directories will be created automatically and you can authenticate from inside the container.
 

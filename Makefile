@@ -11,12 +11,13 @@ build:
 ## Start the container (web VNC on http://localhost:8080)
 start:
 	@docker rm -f $(CONTAINER_NAME) 2>/dev/null || true
-	docker run --rm -d \
+		docker run --rm -d \
 		-p $(PORT):8080 \
 		-v $$(pwd):/home/developer/workspace \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $$HOME/.claude:/home/developer/.claude \
 		-v $$HOME/.config/opencode:/home/developer/.config/opencode \
+		-v $$HOME/.codex:/home/developer/.codex \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 	@echo "Web VNC running at http://localhost:$(PORT)"
@@ -46,8 +47,11 @@ bump:
 	echo "$$NEW_VERSION" > VERSION && \
 	echo "Bumped version: $$VERSION → $$NEW_VERSION"
 
-## Remove image and prune Docker cache
+## Remove container and image
 clean:
 	docker rm -f $(CONTAINER_NAME) 2>/dev/null || true
 	docker rmi $(IMAGE_NAME) 2>/dev/null || true
+
+## Prune Docker cache (use with caution)
+prune:
 	docker system prune -f

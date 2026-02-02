@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     man-db \
     manpages \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 FROM base AS core-tools
@@ -50,17 +51,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Install .NET SDK
-RUN wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && rm packages-microsoft-prod.deb \
-    && apt-get clean && \
-    rm -rf /var/cache/apt/archives/* && \
-    apt-get update \
-    && apt-get install -y dotnet-sdk-8.0 \
-    && apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-
 # Install Go
 RUN wget -O go.tar.gz https://go.dev/dl/go1.21.5.linux-amd64.tar.gz \
     && tar -C /usr/local -xzf go.tar.gz \
@@ -75,15 +65,6 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/s
     && apt-get install -y terraform \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chromium and dependencies
-RUN apt-get clean && \
-    rm -rf /var/cache/apt/archives/* && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-    chromium-browser \
-    chromium-chromedriver \
-    && apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Install Ghostty terminal emulator (community .deb from mkasberg/ghostty-ubuntu)
 RUN GHOSTTY_VERSION="1.2.3-0.ppa1" && \
@@ -161,12 +142,37 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
 # Install AI coding agents
 RUN npm install -g @anthropic-ai/claude-code opencode-ai @openai/codex
 
+
 # Expose port 8080 for web RDP
 EXPOSE 8080
 
 # Switch to developer user
 USER developer
 WORKDIR /home/developer
+
+# Create desktop shortcuts
+RUN <<'EOF'
+mkdir -p /home/developer/Desktop
+cat > /home/developer/Desktop/vscode.desktop <<'EOT'
+[Desktop Entry]
+Type=Application
+Name=Visual Studio Code
+Exec=code
+Icon=code
+Terminal=false
+Categories=Development;IDE;
+EOT
+cat > /home/developer/Desktop/ghostty.desktop <<'EOT'
+[Desktop Entry]
+Type=Application
+Name=Ghostty
+Exec=ghostty
+Icon=ghostty
+Terminal=false
+Categories=System;TerminalEmulator;
+EOT
+chmod +x /home/developer/Desktop/*.desktop
+EOF
 
 # Install Oh My Zsh with robbyrussell theme and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
